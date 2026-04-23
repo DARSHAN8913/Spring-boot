@@ -1,0 +1,170 @@
+================================================================================
+FILE: pom.xml
+================================================================================
+
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.7.16</version>
+		<relativePath/>
+	</parent>
+	<groupId>net.engineeringdigest</groupId>
+	<artifactId>JMS</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>JMS</name>
+	<description>E2EE Journal App</description>
+	<properties>
+		<java.version>1.8</java.version>
+	</properties>
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+        <dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.mysql</groupId>
+			<artifactId>mysql-connector-j</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>
+
+
+================================================================================
+DIRECTORY TREE: src/main/java
+================================================================================
+
+java
+└── net
+    └── engineeringdigest
+        ├── entity
+        │   └── Plan.java
+        ├── JMS
+        ├── repository
+        │   └── jmsrepo.java
+        └── JMS.java
+
+================================================================================
+FILE: src\main\java\net\engineeringdigest\entity\Plan.java
+================================================================================
+
+package net.engineeringdigest.entity;
+
+import jdk.jfr.Unsigned;
+import lombok.Data;
+import javax.persistence.*;
+import java.time.LocalDateTime;
+@Entity   // can we interchange the order of this annot?
+@Table(name="plans")
+@Data
+public class Plan {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "plan_name", nullable = false)
+    private String planName;
+
+    private Integer inventory_limit;
+    private Integer saleLimit;
+    private Integer apiLimit;
+    private String duration;
+    private Double price;
+
+    @Column(name = "createdAt", updatable = false)
+    private LocalDateTime createdAt;
+
+    @Column(name = "updatedAt")
+    private LocalDateTime updatedAt;
+    // below hooks does they execute at the db level or like is there a n+1 execution by app on db
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
+}
+
+================================================================================
+FILE: src\main\java\net\engineeringdigest\JMS.java
+================================================================================
+
+package net.engineeringdigest;
+
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class JMS {
+
+    public static void main(String[] args) {
+        SpringApplication.run(JMS.class, args);
+    }
+
+
+}
+
+================================================================================
+FILE: src\main\java\net\engineeringdigest\repository\jmsrepo.java
+================================================================================
+
+package net.engineeringdigest.repository;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import net.engineeringdigest.entity.Plan;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface jmsrepo extends JpaRepository<Plan,Long> {
+
+}
+===================
+application.properties:
+# MySQL Connection Settings
+spring.datasource.url=jdbc:mysql://localhost:3306/jms?useSSL=false
+spring.datasource.username=root
+spring.datasource.password=test
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+
+# JPA / Hibernate Settings
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL8Dialect
+
