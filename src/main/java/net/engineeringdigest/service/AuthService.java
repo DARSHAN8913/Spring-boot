@@ -4,6 +4,7 @@ import net.engineeringdigest.dto.LoginRequest;
 import net.engineeringdigest.dto.RegisterRequest;
 import net.engineeringdigest.entity.User;
 import net.engineeringdigest.repository.UserRepository;
+import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +13,7 @@ import java.util.Optional;
 @Service
 public class AuthService {
     private final UserRepository userRepository;
+
     private final BCryptPasswordEncoder passwordEncoder;
 
     public AuthService (UserRepository userRepository,BCryptPasswordEncoder passwordEncoder) {
