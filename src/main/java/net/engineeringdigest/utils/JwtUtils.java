@@ -1,16 +1,18 @@
 package net.engineeringdigest.utils;
 
 import io.jsonwebtoken.*;
+import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Component;
 
+import javax.crypto.SecretKey;
 import java.util.Date;
 
 @Component
 public class JwtUtils {
+//    private final SecretKey SECRET = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+    private final String SECRET = "ngaPzm05hn9GAwLE0rhCcTxiIoWQ8kw4vEBCDDeC5n5"; // move to env in real systems
 
-    private final String SECRET = "mysecretkey123"; // move to env in real systems
-
-    private final long EXPIRATION = 1000 * 30 * 1; // 30 mins
+    private final long EXPIRATION = 1000 * 60 * 1; // 30 mins
 
     // GENERATE TOKEN
     public String generateToken(Long uid, String email, String role) {
@@ -30,8 +32,9 @@ public class JwtUtils {
     // VALIDATE TOKEN
     public Claims validateToken(String token) {
 
-        return Jwts.parser()
+        return Jwts.parserBuilder()
                 .setSigningKey(SECRET)
+                .build()
                 .parseClaimsJws(token)
                 .getBody();
     }
