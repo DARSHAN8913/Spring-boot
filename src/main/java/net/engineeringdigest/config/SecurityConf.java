@@ -36,7 +36,28 @@ public class SecurityConf {
                 .antMatchers("/auth/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
+                .exceptionHandling()
+                .authenticationEntryPoint((request, response, authException) -> {
+                    response.setStatus(401);
+                    response.getWriter().write("Missing or invalid token");
+                })
+                .accessDeniedHandler(((request, response, accessDeniedException) -> {
+                    response.setStatus(403);
+                    response.getWriter().write("Forbidden bro");
+                }))
+                .and()
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
+//        http
+//                .csrf().disable()
+//                .sessionManagement()
+//                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+//                .and()
+//                .authorizeRequests()
+//                .antMatchers("/auth/**").permitAll()
+//                .anyRequest().authenticated()
+//                .and()
+//                .addFilterBefore(jwtFilter,subsciptionFilter, UsernamePasswordAuthenticationFilter.class);
+//        return http.build();
     }
 }

@@ -23,7 +23,7 @@ public class AuthController {
         this.authService = authService;
         this.jwtUtils = jwtUtils;
     }
-    @PostMapping("/regis")
+    @PostMapping("/regis") // skip if exsists not implemented
     public  ResponseEntity<?> register(@RequestBody RegisterRequest request){
 
          User user = authService.register(request);
